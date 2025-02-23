@@ -1,44 +1,122 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ESG 碳盤查 & 工程計算機</title>
-
-    <!-- PWA 設定 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工程計算機</title>
     <link rel="manifest" href="manifest.json">
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('service-worker.js')
-            .then(() => console.log("✅ Service Worker 註冊成功"))
-            .catch(error => console.log("❌ Service Worker 註冊失敗", error));
+    <link rel="icon" href="icon-192.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: #f4f4f4;
         }
-    </script>
-
-    <link rel="stylesheet" href="css/style.css">
+        .calculator {
+            width: 90vw;
+            max-width: 400px;
+            margin: 10vh auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input {
+            width: 100%;
+            height: 50px;
+            font-size: 24px;
+            text-align: right;
+            margin-bottom: 10px;
+            padding: 5px;
+        }
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        button {
+            padding: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            background: #ddd;
+            border-radius: 5px;
+            border: none;
+        }
+        button.operator { background: #f9a825; color: white; }
+        button.equal { background: #4caf50; color: white; }
+        button.clear { background: #d32f2f; color: white; }
+    </style>
 </head>
 <body>
-    <h2>🌱 ESG 碳盤查 & 工程計算機</h2>
 
-    <!-- 切換按鈕 -->
-    <button onclick="showCalculator('carbon')">📊 碳盤查計算</button>
-    <button onclick="showCalculator('engineer')">🔢 工程計算機</button>
+<div class="calculator">
+    <h2>工程計算機</h2>
+    <input type="text" id="display" onkeydown="handleKeyPress(event)">
+    <div class="buttons">
+        <button onclick="appendNumber('sin(')">sin</button>
+        <button onclick="appendNumber('cos(')">cos</button>
+        <button onclick="appendNumber('tan(')">tan</button>
+        <button onclick="appendNumber('sqrt(')">√</button>
+        <button onclick="appendNumber('^')">x^y</button>
 
-    <!-- 碳盤查計算器 -->
-    <div id="carbon_calculator">
-        <h3>📊 碳盤查計算</h3>
-        <input type="text" id="carbon_input" placeholder="輸入碳排放數據 (kg)">
-        <button onclick="calculateCarbon()">計算</button>
-        <p>🌍 你的碳排放量: <span id="carbon_result">0</span> kg</p>
+        <button onclick="appendNumber('7')">7</button>
+        <button onclick="appendNumber('8')">8</button>
+        <button onclick="appendNumber('9')">9</button>
+        <button class="operator" onclick="appendNumber('/')">/</button>
+
+        <button onclick="appendNumber('4')">4</button>
+        <button onclick="appendNumber('5')">5</button>
+        <button onclick="appendNumber('6')">6</button>
+        <button class="operator" onclick="appendNumber('*')">*</button>
+
+        <button onclick="appendNumber('1')">1</button>
+        <button onclick="appendNumber('2')">2</button>
+        <button onclick="appendNumber('3')">3</button>
+        <button class="operator" onclick="appendNumber('-')">-</button>
+
+        <button onclick="appendNumber('0')">0</button>
+        <button onclick="appendNumber('.')">.</button>
+        <button class="equal" onclick="calculate()">=</button>
+        <button class="clear" onclick="clearDisplay()">C</button>
     </div>
+</div>
 
-    <!-- 工程計算機 -->
-    <div id="engineering_calculator" style="display: none;">
-        <h3>🔢 工程計算機</h3>
-        <input type="text" id="calc_display" readonly>
-        <div id="calculator_buttons"></div>
-    </div>
+<script>
+    function appendNumber(num) {
+        document.getElementById('display').value += num;
+    }
 
-    <script src="js/app.js"></script>
+    function calculate() {
+        try {
+            let expression = document.getElementById('display').value;
+            expression = expression.replace(/sin\(/g, 'Math.sin(')
+                                   .replace(/cos\(/g, 'Math.cos(')
+                                   .replace(/tan\(/g, 'Math.tan(')
+                                   .replace(/log\(/g, 'Math.log10(')
+                                   .replace(/sqrt\(/g, 'Math.sqrt(')
+                                   .replace(/\^/g, '**');
+            document.getElementById('display').value = eval(expression);
+        } catch (e) {
+            document.getElementById('display').value = 'Error';
+        }
+    }
+
+    function clearDisplay() {
+        document.getElementById('display').value = '';
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === "Enter") {
+            calculate();
+        }
+    }
+
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('service-worker.js')
+            .then(() => console.log('Service Worker Registered'))
+            .catch((error) => console.error('Service Worker Registration Failed:', error));
+    }
+</script>
+
 </body>
 </html>
